@@ -469,11 +469,11 @@ void _halrf_txgapk_calculate_offset_8822c(
 
 		odm_set_bb_reg(dm, R_0x1b10, 0xff, 0x0);
 
-		if (channel >= 36 && channel <= 64)
+		if (channel >= 16 && channel <= 96)
 			odm_set_bb_reg(dm, R_0x1b98, 0x00007000, 0x2);
 		else if (channel >= 100 && channel <= 144)
 			odm_set_bb_reg(dm, R_0x1b98, 0x00007000, 0x3);
-		else if (channel >= 149 && channel <= 177) 
+		else if (channel >= 149 && channel <= 253) 
 			odm_set_bb_reg(dm, R_0x1b98, 0x00007000, 0x4);
 
 		odm_set_bb_reg(dm, R_0x820, 0x00000003, path + 1);
@@ -610,7 +610,7 @@ void _halrf_txgapk_write_tx_gain_8822c(
 		tmp = 0x20;	/*2G OFDM*/
 		tmp1 = 0x60;	/*2G CCK*/
 		band_idx = 1;
-	} else if (channel >= 36 && channel <= 64) {
+	} else if (channel >= 16 && channel <= 96) {
 		tmp = 0x200;	/*5G L*/
 		tmp1 = 0x0;
 		band_idx = 2;
@@ -618,7 +618,7 @@ void _halrf_txgapk_write_tx_gain_8822c(
 		tmp = 0x280;	/*5G M*/
 		tmp1 = 0x0;
 		band_idx = 3;
-	} else if (channel >= 149 && channel <= 177) {
+	} else if (channel >= 149 && channel <= 253) {
 		tmp = 0x300;	/*5G H*/
 		tmp1 = 0x0;
 		band_idx = 4;

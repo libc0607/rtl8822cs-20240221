@@ -155,6 +155,10 @@ void construct_ht_ndpa_packet(
 	//PMGNT_INFO				mgnt_info = &((MGNT_INFO)(((PADAPTER)adapter)->MgntInfo));
 	OCTET_STRING p_ndpa_frame, action_content;
 	u8 action_hdr[4] = {ACT_CAT_VENDOR, 0x00, 0xe0, 0x4c};
+	
+	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
+	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
+	u8 aSifsTime = 0;
 
 	PlatformZeroMemory(buffer, 32);
 
@@ -167,7 +171,13 @@ void construct_ht_ndpa_packet(
 	SET_80211_HDR_ADDRESS2(buffer, ((PADAPTER)adapter)->CurrentAddress);
 	SET_80211_HDR_ADDRESS3(buffer, ((PMGNT_INFO)mgnt_info)->Bssid);
 
-	duration = 2 * a_SifsTime + 40;
+	aSifsTime = a_SifsTime;
+	if (pmlmeinfo->sifs_override_en == 1) {
+		aSifsTime = pmlmeinfo->sifs_override;
+		RTW_INFO("construct_ht_ndpa_packet: sifs_override enabled, %d\n", aSifsTime);
+	}
+
+	duration = 2 * aSifsTime + 40;
 
 	if (BW == CHANNEL_WIDTH_40)
 		duration += 87;
@@ -315,6 +325,9 @@ void construct_vht_ndpa_packet(
 	// For all linux code, it should be useless?
 	//void				*adapter = dm->adapter;
 	ADAPTER * adapter = (PADAPTER)(dm->adapter);
+	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
+	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
+	u8 aSifsTime = 0;
 	u8 idx = 0;
 	struct _RT_BEAMFORMEE_ENTRY *beamform_entry = phydm_beamforming_get_bfee_entry_by_addr(dm, RA, &idx);
 	/* @Frame control. */
@@ -326,7 +339,13 @@ void construct_vht_ndpa_packet(
 
 	// 2017/11 MH PHYDM compile. But why need to use windows maco?
 	// For all linux code, it should be useless?
-	duration = 2 * a_SifsTime + 44;
+	aSifsTime = a_SifsTime;
+	if (pmlmeinfo->sifs_override_en == 1) {
+		aSifsTime = pmlmeinfo->sifs_override;
+		RTW_INFO("construct_vht_ndpa_packet: sifs_override enabled, %d\n", aSifsTime);
+	}
+
+	duration = 2 * aSifsTime + 44;
 
 	if (BW == CHANNEL_WIDTH_80)
 		duration += 40;
@@ -750,6 +769,9 @@ void construct_vht_mu_ndpa_packet(
 {
 	struct _RT_BEAMFORMING_INFO *beam_info = &(dm->beamforming_info);
 	void *adapter = beam_info->source_adapter;
+	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
+	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
+	u8 aSifsTime = 0;
 	u16 duration = 0;
 	u8 sequence = 0;
 	u8 *p_ndpa_frame = buffer;
@@ -779,7 +801,13 @@ void construct_vht_mu_ndpa_packet(
 
 	/*@--------------------------------------------*/
 	/* @<Note> Need to modify "duration" to MU consideration. */
-	duration = 2 * a_SifsTime + 44;
+	aSifsTime = a_SifsTime;
+	if (pmlmeinfo->sifs_override_en == 1) {
+		aSifsTime = pmlmeinfo->sifs_override;
+		RTW_INFO("construct_vht_ndpa_packet: sifs_override enabled, %d\n", aSifsTime);
+	}
+
+	duration = 2 * aSifsTime + 44;
 
 	if (BW == CHANNEL_WIDTH_80)
 		duration += 40;
@@ -1064,7 +1092,10 @@ send_fw_ht_ndpa_packet(
 		a_sifs_time = 10;
 	else
 		a_sifs_time = 16;
-
+	if (pmlmeinfo->sifs_override_en == 1) {
+		a_sifs_time = pmlmeinfo->sifs_override;
+		RTW_INFO("send_fw_ht_ndpa_packet: sifs_override enabled, %d\n", a_sifs_time);
+	}
 	duration = 2 * a_sifs_time + 40;
 
 	if (BW == CHANNEL_WIDTH_40)
@@ -1150,6 +1181,10 @@ send_sw_ht_ndpa_packet(
 		a_sifs_time = 10;
 	else
 		a_sifs_time = 16;
+	if (pmlmeinfo->sifs_override_en == 1) {
+		a_sifs_time = pmlmeinfo->sifs_override;
+		RTW_INFO("send_sw_ht_ndpa_packet: sifs_override enabled, %d\n", a_sifs_time);
+	}
 
 	duration = 2 * a_sifs_time + 40;
 
@@ -1238,6 +1273,10 @@ send_fw_vht_ndpa_packet(
 		a_sifs_time = 16;
 	else
 		a_sifs_time = 10;
+	if (pmlmeinfo->sifs_override_en == 1) {
+		a_sifs_time = pmlmeinfo->sifs_override;
+		RTW_INFO("send_fw_vht_ndpa_packet: sifs_override enabled, %d\n", a_sifs_time);
+	}
 
 	duration = 2 * a_sifs_time + 44;
 
@@ -1339,6 +1378,10 @@ send_sw_vht_ndpa_packet(
 		a_sifs_time = 16;
 	else
 		a_sifs_time = 10;
+	if (pmlmeinfo->sifs_override_en == 1) {
+		a_sifs_time = pmlmeinfo->sifs_override;
+		RTW_INFO("send_sw_vht_ndpa_packet: sifs_override enabled, %d\n", a_sifs_time);
+	}
 
 	duration = 2 * a_sifs_time + 44;
 

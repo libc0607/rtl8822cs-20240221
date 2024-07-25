@@ -1226,13 +1226,13 @@ static u8 rtw_get_ch_group(u8 ch, u8 *group, u8 *cck_group)
 	} else {
 		band = BAND_ON_5G;
 
-		if (36 <= ch && ch <= 42)
+		if (16 <= ch && ch <= 42)
 			gp = 0;
 		else if (44   <= ch && ch <=  48)
 			gp = 1;
 		else if (50   <= ch && ch <=  58)
 			gp = 2;
-		else if (60   <= ch && ch <=  64)
+		else if (60   <= ch && ch <=  98)
 			gp = 3;
 		else if (100  <= ch && ch <= 106)
 			gp = 4;
@@ -1252,7 +1252,7 @@ static u8 rtw_get_ch_group(u8 ch, u8 *group, u8 *cck_group)
 			gp = 11;
 		else if (165  <= ch && ch <= 171)
 			gp = 12;
-		else if (173  <= ch && ch <= 177)
+		else if (173  <= ch && ch <= 253)
 			gp = 13;
 		else
 			band = BAND_MAX;
@@ -1341,7 +1341,7 @@ bypass_2g:
 				continue;
 
 			upper = pwr_info_5g->IndexBW40_Base[rfpath][group];
-			lower = pwr_info_5g->IndexBW40_Base[rfpath][group + 1];
+			lower = pwr_info_5g->IndexBW40_Base[rfpath][group+1>13? group: group+1];
 			hal_data->Index5G_BW80_Base[rfpath][ch_idx] = (upper + lower) / 2;
 		}
 
@@ -1463,7 +1463,7 @@ void dump_hal_txpwr_info_5g(void *sel, _adapter *adapter, u8 rfpath_num, u8 max_
 	RTW_PRINT_SEL(sel, "BW40-1S base:\n");
 	do {
 		#define DUMP_5G_BW40_BASE_SECTION_NUM 3
-		u8 end[DUMP_5G_BW40_BASE_SECTION_NUM] = {64, 144, 177};
+		u8 end[DUMP_5G_BW40_BASE_SECTION_NUM] = {64, 144, 253};
 
 		RTW_PRINT_SEL(sel, "%4s ", "");
 		for (ch_idx = ch_idx_s; ch_idx < CENTER_CH_5G_ALL_NUM; ch_idx++) {
