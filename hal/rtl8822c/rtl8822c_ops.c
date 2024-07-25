@@ -3643,8 +3643,44 @@ static void fill_default_txdesc(struct xmit_frame *pxmitframe, u8 *pbuf)
 
 	desc_size = rtl8822c_get_tx_desc_size(adapter);
 	_rtw_memset(pbuf, 0, desc_size);
+	
+	if (pattrib->inject == 0xa5) {
+		SET_TX_DESC_LS_8822C(pbuf, 1);
+		SET_TX_DESC_MACID_8822C(pbuf, pattrib->mac_id);
+		SET_TX_DESC_RATE_ID_8822C(pbuf, pattrib->raid);
+		SET_TX_DESC_QSEL_8822C(pbuf, pattrib->qsel);
+		SET_TX_DESC_SW_SEQ_8822C(pbuf, pattrib->seqnum);
 
-	if (pxmitframe->frame_tag == DATA_FRAMETAG) {
+		SET_TX_DESC_EN_HWSEQ_8822C(pbuf, 0); 
+		SET_TX_DESC_SW_SEQ_8822C(pbuf, pattrib->seqnum); 
+
+		SET_TX_DESC_RTY_LMT_EN_8822C(pbuf, 1);
+
+		if (pattrib->retry_ctrl == _TRUE) {
+			SET_TX_DESC_RTS_DATA_RTY_LMT_8822C(pbuf, 6); 
+		} else {
+			SET_TX_DESC_RTS_DATA_RTY_LMT_8822C(pbuf, 0);
+		}
+		if (pattrib->sgi == _TRUE) {
+			SET_TX_DESC_DATA_SHORT_8822C(pbuf, 1);
+		} else {
+			SET_TX_DESC_DATA_SHORT_8822C(pbuf, 0);
+		}
+
+		SET_TX_DESC_DISDATAFB_8822C(pbuf, 1);
+		SET_TX_DESC_DISRTSFB_8822C(pbuf, 1);
+
+		SET_TX_DESC_USE_RATE_8822C(pbuf, 1);
+		SET_TX_DESC_DATARATE_8822C(pbuf, MRateToHwRate(pattrib->rate));
+
+		if (pattrib->ldpc) {
+			SET_TX_DESC_DATA_LDPC_8822C(pbuf, 1);
+		}
+		SET_TX_DESC_DATA_STBC_8822C(pbuf, pattrib->stbc & 3);
+		SET_TX_DESC_DATA_BW_8822C(pbuf, pattrib->bwmode);
+
+	}
+	else if (pxmitframe->frame_tag == DATA_FRAMETAG) {
 		u8 drv_userate = 0;
 
 		SET_TX_DESC_MACID_8822C(pbuf, pattrib->mac_id);
@@ -3859,12 +3895,15 @@ static void fill_default_txdesc(struct xmit_frame *pxmitframe, u8 *pbuf)
 	 * (3) Use HW Qos SEQ to control the seq num of Ext port non-Qos packets.
 	 * 2010.06.23. Added by tynli.
 	 */
-	if (!pattrib->qos_en) {
-		SET_TX_DESC_DISQSELSEQ_8822C(pbuf, 1);
-		SET_TX_DESC_EN_HWSEQ_8822C(pbuf, 1);
-		SET_TX_DESC_HW_SSN_SEL_8822C(pbuf, pattrib->hw_ssn_sel);
+	if (pattrib->inject != 0xa5) {
+		if (!pattrib->qos_en) {
+			SET_TX_DESC_DISQSELSEQ_8822C(pbuf, 1);
+			SET_TX_DESC_EN_HWSEQ_8822C(pbuf, 1);
+			SET_TX_DESC_HW_SSN_SEL_8822C(pbuf, pattrib->hw_ssn_sel);
+		} else {
+			SET_TX_DESC_SW_SEQ_8822C(pbuf, pattrib->seqnum);
+		}
 	}
-
 	SET_TX_DESC_PORT_ID_8822C(pbuf, hw_port);
 	SET_TX_DESC_MULTIPLE_PORT_8822C(pbuf, hw_port);
 
