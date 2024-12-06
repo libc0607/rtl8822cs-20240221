@@ -173,7 +173,7 @@ static inline void _rtw_radiotap_fill_flags(struct rx_pkt_attrib *a, u8 *flags)
 
 sint rtw_fill_radiotap_hdr(_adapter *padapter, struct rx_pkt_attrib *a, u8 *buf)
 {
-#define RTAP_HDR_MAX 256
+#define RTAP_HDR_MAX 128
 
 	sint ret = _SUCCESS;
 	struct moinfo *moif = (struct moinfo *)&a->moif;
