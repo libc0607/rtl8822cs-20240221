@@ -327,7 +327,9 @@ static _pkt *prepare_recvframe_pkt(struct recv_buf *recvbuf, union recv_frame *r
 		shift_sz = 6;
 	else
 		shift_sz = 0;
-
+		
+        shift_sz += 128; // Add 128 bytes room for radiotap header 
+        
 	/*
 	 * For first fragment packet, driver need allocate
 	 * (1536 + drvinfo_sz + RXDESC_SIZE) to defrag packet.
@@ -335,12 +337,14 @@ static _pkt *prepare_recvframe_pkt(struct recv_buf *recvbuf, union recv_frame *r
 	 * And need 8 is for skb->data 8 bytes alignment.
 	 * Round (1536 + 24 + 32 + shift_sz + 8) to 128 bytes alignment,
 	 * and finally get 1664.
+	 *
+	 * Mod: Add 128 bytes room for radiotap header 
 	 */
 	if ((attrib->mfrag == 1) && (attrib->frag_num == 0)) {
 		if (skb_len <= 1650)
-			alloc_sz = 1664;
+			alloc_sz = 1664 + 128;
 		else
-			alloc_sz = skb_len + 14;
+			alloc_sz = skb_len + 14 + 128;
 	} else {
 		alloc_sz = skb_len;
 		/*
