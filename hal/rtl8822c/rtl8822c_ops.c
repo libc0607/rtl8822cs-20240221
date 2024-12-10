@@ -3464,9 +3464,7 @@ void rtl8822c_fill_txdesc_bmc_tx_rate(struct pkt_attrib *pattrib, u8 *ptxdesc)
  */
 void rtl8822c_fill_txdesc_bf(struct xmit_frame *frame, u8 *desc)
 {
-#ifndef CONFIG_BEAMFORMING
-	return;
-#else /* CONFIG_BEAMFORMING */
+#if defined(CONFIG_BEAMFORMING) || defined(CONFIG_BEAMFORMING_MONITOR) 
 	struct pkt_attrib *attrib;
 	struct _ADAPTER *padapter = frame->padapter;
 	struct hal_com_data *pHalData = GET_HAL_DATA(padapter);
@@ -3484,6 +3482,8 @@ void rtl8822c_fill_txdesc_bf(struct xmit_frame *frame, u8 *desc)
 	/* Force to disable STBC when txbf is enabled */
 	if (attrib->txbf_p_aid && attrib->stbc)
 		SET_TX_DESC_DATA_STBC_8822C(desc, 0);
+#else
+        return;
 #endif /* CONFIG_BEAMFORMING */
 }
 
@@ -3497,9 +3497,7 @@ void rtl8822c_fill_txdesc_bf(struct xmit_frame *frame, u8 *desc)
  */
 void rtl8822c_fill_txdesc_mgnt_bf(struct xmit_frame *frame, u8 *desc)
 {
-#ifndef CONFIG_BEAMFORMING
-	return;
-#else /* CONFIG_BEAMFORMING */
+#if defined(CONFIG_BEAMFORMING) || defined(CONFIG_BEAMFORMING_MONITOR)
 	PADAPTER adapter;
 	struct pkt_attrib *attrib;
 	u8 ndpa = 0;
@@ -3550,6 +3548,8 @@ void rtl8822c_fill_txdesc_mgnt_bf(struct xmit_frame *frame, u8 *desc)
 	 */
 	/*SET_TX_DESC_P_AID_8822C(desc, pattrib->txbf_p_aid);*/
 	SET_TX_DESC_SND_PKT_SEL_8822C(desc, attrib->bf_pkt_type);
+#else
+        return;
 #endif /* CONFIG_BEAMFORMING */
 }
 

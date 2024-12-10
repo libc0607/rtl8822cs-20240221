@@ -18,6 +18,9 @@ EXTRA_CFLAGS += -Wno-uninitialized
 # Let the OS decide the regd instead of phy "self-managed"
 EXTRA_CFLAGS += -DCONFIG_REGD_SRC_FROM_OS
 
+# Monitor Beamforming
+EXTRA_CFLAGS += -DCONFIG_BEAMFORMING_MONITOR
+
 ############ ANDROID COMMON KERNEL ############
 # clang
 ifeq ($(CC), clang)
