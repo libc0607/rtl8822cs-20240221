@@ -342,9 +342,9 @@ static _pkt *prepare_recvframe_pkt(struct recv_buf *recvbuf, union recv_frame *r
 	 */
 	if ((attrib->mfrag == 1) && (attrib->frag_num == 0)) {
 		if (skb_len <= 1650)
-			alloc_sz = 1664 + 128;
+			alloc_sz = 1664;
 		else
-			alloc_sz = skb_len + 14 + 128;
+			alloc_sz = skb_len + 14;
 	} else {
 		alloc_sz = skb_len;
 		/*
@@ -354,6 +354,8 @@ static _pkt *prepare_recvframe_pkt(struct recv_buf *recvbuf, union recv_frame *r
 		alloc_sz += 14;
 	}
 
+        alloc_sz += 128;
+        
 	pkt = rtw_skb_alloc(alloc_sz);
 	if (pkt) {
 		pkt->dev = recvframe->u.hdr.adapter->pnetdev;
