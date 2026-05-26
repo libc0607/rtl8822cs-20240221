@@ -313,8 +313,9 @@ static _pkt *prepare_recvframe_pkt(struct recv_buf *recvbuf, union recv_frame *r
 
 	attrib = &recvframe->u.hdr.attrib;
 	skb_len = attrib->pkt_len;
-	if (rtl8822c_rx_fcs_appended(recvbuf->adapter))
-		skb_len -= IEEE80211_FCS_LEN;
+	if (check_fwstate(&recvbuf->adapter->mlmepriv, WIFI_MONITOR_STATE)==_FALSE)
+		if (rtl8822c_rx_fcs_appended(recvbuf->adapter))
+			skb_len -= IEEE80211_FCS_LEN;
 	data = recvbuf->pdata + desc_size + attrib->drvinfo_sz;
 #if 0
 	data += attrib->shift_sz;
